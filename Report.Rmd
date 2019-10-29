@@ -1,0 +1,135 @@
+
+
+
+ 
+
+# Introduction 
+Hello, fellow students.
+My name is Marcello I am submitting my work for your evaluation.
+I hope the work could be clear enough for you to understand it without effort, at least, I'll do my best to get this objective.
+
+The project itself is based on the postulates that were given to us at the capstone module of the Data Science Professional Certificate.
+My submission for this project is three files:
+    A report in PDF format: Report.pdf
+    A report in Rmd format: Report.Rmd
+    A script in R format: Script.R  
+	
+If one or more of these files are damaged or not available,please be so kind to download them from:
+	https://raw.githubusercontent.com/ubatifce/capstone/Report.pdf
+    https://raw.githubusercontent.com/ubatifce/capstone/Report.Rmd
+    https://raw.githubusercontent.com/ubatifce/capstone/Script.R
+
+
+#***Executive Summary Section ***
+
+*****Dataset:
+A set of datasets were given to us by the staff members.
+The ones that were used were the standard ones, all of the based on the MovieLens database, and downloaded in the ml-10M100K.zip file.
+Anyway, in my script, I used the  automatic downloading procedure so I got:
+
+*****Goal of the project 
+*****Key steps that were performed
+
+
+#***Methods/analysis section ***
+*****Process and techniques used, 
+******Data cleaning 
+******Data exploration 
+******Visualization and insights gained
+******Modeling approach
+
+#***Results section ***
+
+*****Modeling results and discusses 
+*****Model performance
+
+
+#***Conclusion section ***
+
+*****Summary of the report 
+*****Limitations 
+*****Future work 
+
+
+
+#----------------------------------------------------------------------------------------------
+
+
+#POST DATA Script used for the project
+
+################################
+# Create edx set, validation set
+# *** No need to run this if ratings,edx,validation etc. have already been loaded *** #
+
+################################
+
+# Note: this process could take a couple of minutes
+
+
+
+```
+
+if(!require(tidyverse)) install.packages("tidyverse", repos = "http://cran.us.r-project.org")
+if(!require(caret)) install.packages("caret", repos = "http://cran.us.r-project.org")
+if(!require(data.table)) install.packages("data.table", repos = "http://cran.us.r-project.org")
+
+```
+
+# MovieLens 10M dataset:
+# https://grouplens.org/datasets/movielens/10m/
+# http://files.grouplens.org/datasets/movielens/ml-10m.zip
+
+```
+dl <- tempfile()
+download.file("http://files.grouplens.org/datasets/movielens/ml-10m.zip", dl)
+
+ratings <- fread(text = gsub("::", "\t", readLines(unzip(dl, "ml-10M100K/ratings.dat"))),
+                 col.names = c("userId", "movieId", "rating", "timestamp"))
+
+movies <- str_split_fixed(readLines(unzip(dl, "ml-10M100K/movies.dat")), "\\::", 3)
+colnames(movies) <- c("movieId", "title", "genres")
+movies <- as.data.frame(movies) %>% mutate(movieId = as.numeric(levels(movieId))[movieId],
+                                           title = as.character(title),
+                                           genres = as.character(genres))
+
+movielens <- left_join(ratings, movies, by = "movieId")
+```
+# Validation set will be 10% of MovieLens data
+```
+set.seed(1, sample.kind="Rounding")
+```
+
+# if using R 3.5 or earlier, use `set.seed(1)` instead
+
+```
+test_index <- createDataPartition(y = movielens$rating, times = 1, p = 0.1, list = FALSE)
+edx <- movielens[-test_index,]
+temp <- movielens[test_index,]
+
+```
+# Make sure userId and movieId in validation set are also in edx set
+
+```
+validation <- temp %>% 
+     semi_join(edx, by = "movieId") %>%
+     semi_join(edx, by = "userId")
+```
+# Add rows removed from validation set back into edx set
+
+```
+removed <- anti_join(temp, validation)
+edx <- rbind(edx, removed)
+```
+
+hola
+#que | Header One     | Header Two     |
+| :------------- | :------------- |
+| Item One       | Item Two       |
+
+***fffffffffff***
+**dddddddddddddddd*
+*ffffffffffffff*
+`code`
+## title
+*que es esto*
+`code here`
