@@ -67,7 +67,24 @@ Number of Web Hits: 1018726
 Files are expected to be downloaded from the uploaded files using the edx submision form. 	
 As the staff recommend also providing a link to a GitHub repository containing the three files above, I also include links to a repository. 
 
-If one or more of these files are damaged or not available,an alternative way to download them is:
+The dataset is perhaps the most difficult: 
+The Edx system only lets .r .Rmd or .pdf files to be uploaded.
+So, the script contains an auto download code as:
+
+#Direct downloading. 
+```{r}
+library(downloader) 
+url <- "https://github.com/ubatifce/capstone/blob/master/bank-additional-full.csv"
+filename <- "bank-additional-full.csv"
+download(url, destfile=filename)
+```
+#Edx downloading. 
+If there is a problem with this, I renamed bank-additional-full.csv as bank-additional-full.r I could upload this file.
+You only have to rename bank-additional-full.r to bank-additional-full.csv and work normally
+
+#GitHub downloading.   
+Finally: If none of these methods work you can download them from the github repository manually:
+
 All the files are in the public access repository: 
 
 	https://github.com/ubatifce/capstone
