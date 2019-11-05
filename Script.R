@@ -1,213 +1,185 @@
 ################################
-# Create edx set, validation set
-#  No need to run this if ratings,edx,validation etc. have already been loaded 
-#################################
-
-# Note: this process could take a couple of minutes
-
 # INIT LOADING DATASETS. SKIP IF DATA IS ALREADY LOADED
+#################################
 
 if(!require(tidyverse)) install.packages("tidyverse", repos = "http://cran.us.r-project.org")
 if(!require(caret)) install.packages("caret", repos = "http://cran.us.r-project.org")
 if(!require(data.table)) install.packages("data.table", repos = "http://cran.us.r-project.org")
 if(!require(dslabs)) install.packages("dslabs", repos = "http://cran.us.r-project.org")
+if(!require(readxl)) install.packages("dslabs", repos = "http://cran.us.r-project.org")
 
-library(dslabs)
-library(tidyverse)
+#Set default directory to C:/ or change the path in setwd(...)
+setwd("C:/")
+bank<-read.csv2("bank-additional-full.csv") 
+ ncol(bank)
+ nrow(bank)
 
+# clean the data  
 
 
-# MovieLens 10M dataset:
-# https://grouplens.org/datasets/movielens/10m/
-# http://files.grouplens.org/datasets/movielens/ml-10m.zip
+#From "Has the client subscribed a term deposit yes/no?"
+#To      "Has the client subscribed a term deposit 1/0"
 
+  bank$Y<-  1
+  bank$Y[bank$y=="no"]<-  0
 
-dl <- tempfile()
-download.file("http://files.grouplens.org/datasets/movielens/ml-10m.zip", dl)
 
-ratings <- fread(text = gsub("::", "\t", readLines(unzip(dl, "ml-10M100K/ratings.dat"))),
-                 col.names = c("userId", "movieId", "rating", "timestamp"))
 
-movies <- str_split_fixed(readLines(unzip(dl, "ml-10M100K/movies.dat")), "\\::", 3)
-colnames(movies) <- c("movieId", "title", "genres")
-movies <- as.data.frame(movies) %>% mutate(movieId = as.numeric(levels(movieId))[movieId],
-                                           title = as.character(title),
-                                           genres = as.character(genres))
+#Has the client subscribed a term deposit 
+y <- bank$Y
 
-movielens <- left_join(ratings, movies, by = "movieId")
+#Set the seed to 42, then using the caret package to create a 20% data partition based on the "y" data.
 
-# Validation set will be 10% of MovieLens data
+#Assign the 20% partition to test_set and the remaining 80% partition to train_set.
 
-set.seed(1, sample.kind="Rounding")
+set.seed(42, sample.kind="Rounding") 
+test_index <- createDataPartition(y, times = 1, p = 0.2, list = FALSE)
+train_set <- bank %>% slice(-test_index)
+test_set <- bank %>% slice(test_index)
+print("Train SET")
+nrow(train_set)
+ncol(train_set)
+print("test SET")
+nrow(test_set)
+ncol(test_set)
 
 
-# if using R 3.5 or earlier, use `set.seed(1)` instead
+# Proportion of clients who subscribed a term deposit 
 
+testy<-subset(test_set,test_set$y=="yes")
 
-test_index <- createDataPartition(y = movielens$rating, times = 1, p = 0.1, list = FALSE)
-edx <- movielens[-test_index,]
-temp <- movielens[test_index,]
+nrow(testy)/nrow(test_set)
 
 
-# Make sure userId and movieId in validation set are also in edx set
+#Baseline: Using a  sample 0,1 
+y_hat <- sample(c(0,1),nrow(test_set),replace=TRUE)
+#Baseline Accuracy
+mean(y_hat ==test_set$Y)
 
+results <- data_frame(method="Baseline: A sample 0,1 ", Accuracy =  mean(y_hat ==test_set$Y)
+)
 
-validation <- temp %>% 
-     semi_join(edx, by = "movieId") %>%
-     semi_join(edx, by = "userId")
+#Proportion of clients who subscribed a term deposit contacted by type of phone
 
-# Add rows removed from validation set back into edx set
+train_set  %>% filter(contact=="cellular") %>% summarize(mean(Y==1))
+train_set  %>% filter(contact=="telephone") %>% summarize(mean(Y==1))
 
+#Predict clients who subscribed a term deposit  using contact on the test set:
+# Accuracy of this contact-based prediction method on the test set
+y_hat <- if_else(test_set$contact=="telephone",1,0)
+# Accuracy
+mean(y_hat ==test_set$Y)
 
-removed <- anti_join(temp, validation)
-edx <- rbind(edx, removed)
+results <- bind_rows(results,
+                          data_frame(method="clients who subscribed a term deposit  using contact ",  
+                           Accuracy = mean(y_hat ==test_set$Y)
+))
 
-# END LOADING DATASETS
 
-# FIELDS
 
- colnames(edx)
-#[1] "X"         "userId"    "movieId"   "rating"    "timestamp" "title"    
-#[7] "genres"   
 
-# ROWS 
- nrow(edx)
-#[1] 9000055
+   
 
- nrow(validation)
-#[1] 999999
 
-# FINAL ALGORITHM
 
-set.seed(1, sample.kind="Rounding") 
 
-# FINAL ALGORITHM
+#Predicting clients who subscribed a term deposit  by contact & education
+#Accuracy of this contact & education-based prediction method on the test set
 
-#training datasets
-#test_index <- createDataPartition(y = edx$rating, times = 1,
-                                  p = 0.1, list = FALSE)
-#train_set <- edx[-test_index,]
-#test_set <- edx[test_index,]
-#test_set <- test_set %>% 
-#     semi_join(train_set, by = "movieId") %>%
-#     semi_join(train_set, by = "userId")
 
-# final datasets
-train_set <- edx
-test_set <- validation
 
 
+# Accuracy
 
-#A generic (taken fron theory) RMSE function
+train_set  %>% group_by( contact,education) %>% summarize(mean(Y==1))
+y_hat <- if_else(test_set$contact=="telephone" & test_set$education %in% c("professional.course","university.degree") ,1,0)
+mean(y_hat ==test_set$Y)
 
-RMSE <- function(true_ratings, predicted_ratings){
-     sqrt(mean((true_ratings - predicted_ratings)^2))
-}
+# see a graph 
+graph<-bank %>% ggplot(aes(education,contact)) +
+   geom_bar(width = 0.4, stat = "identity", color = "green") +
+   coord_flip()  
+graph 
 
-#Methods used:
 
-               
-          
-#5 Using sum(rating - mu)/(n()+lambda), n_i = n() with min(lambda) 
+results <- bind_rows(results,
+          data_frame(method="clients who subscribed a term deposit  using contact,education ",  
+           Accuracy = mean(y_hat ==test_set$Y)
+))
 
+#Confusion matrices for the contact  model, education model, and combined contact & #education model.
 
-mu <- mean(train_set$rating) 
-movie_avgs <- train_set %>% 
-     group_by(movieId) %>% 
-     summarize(b_i = mean(rating - mu))
-
-user_avgs <- test_set %>% 
-     left_join(movie_avgs, by='movieId') %>%
-     group_by(userId) %>%
-     summarize(b_u = mean(rating - mu - b_i))
-
-predicted_ratings <- test_set %>% 
-     left_join(movie_avgs, by='movieId') %>%
-     left_join(user_avgs, by='userId') %>%
-     mutate(pred = mu + b_i + b_u) %>%
-     .$pred
-
-
-test_set %>% 
-     left_join(movie_avgs, by='movieId') %>%
-     mutate(residual = rating - (mu + b_i)) %>%
-     arrange(desc(abs(residual))) %>% 
-     select(title,  residual) %>% slice(1:10) 
-
-movie_titles <- movielens %>% 
-     select(movieId, title) %>%
-     distinct()
-
-movie_avgs %>% left_join(movie_titles, by="movieId") %>%
-     arrange(b_i) %>% 
-     select(title, b_i) %>% 
-     slice(1:10) 
-
-
-train_set %>% dplyr::count(movieId) %>% 
-     left_join(movie_avgs) %>%
-     left_join(movie_titles, by="movieId") %>%
-     arrange(b_i) %>% 
-     select(title, b_i, n) %>% 
-     slice(1:10) 
-
-
-mu <- mean(train_set$rating)
-movie_reg_avgs <- train_set %>% 
-     group_by(movieId) %>% 
-     summarize(b_i = sum(rating - mu)/(n()+lambda), n_i = n()) 
-
-data_frame(Original = movie_avgs$b_i, 
-           Regularized = movie_reg_avgs$b_i, 
-           n = movie_reg_avgs$n_i) %>%
-     ggplot(aes(Original, Regularized, size=sqrt(n))) + 
-     geom_point(shape=3, alpha=0.25, color="red")
-
-
-train_set %>%
-     dplyr::count(movieId) %>% 
-     left_join(movie_reg_avgs) %>%
-     left_join(movie_titles, by="movieId") %>%
-     arrange(b_i) %>% 
-     select(title, b_i, n) %>% 
-     slice(1:10) 
-
-
-#5 Using sum(rating - mu)/(n()+lambda), n_i = n() with min(lambda)  
-
-
-lambdas <- seq(2.3, 2.5, 0.125)
-
-rmses <- sapply(lambdas, function(l){
-     mu <- mean(train_set$rating)
-     b_i <- train_set %>%
-          group_by(movieId) %>%
-          summarize(b_i = sum(rating - mu)/(n()+l))
-     b_u <- train_set %>% 
-          left_join(b_i, by="movieId") %>%
-          group_by(userId) %>%
-          summarize(b_u = sum(rating - b_i - mu)/(n()+l))
-     predicted_ratings <- 
-          test_set %>% 
-          left_join(b_i, by = "movieId") %>%
-          left_join(b_u, by = "userId") %>%
-          mutate(pred = mu + b_i + b_u) %>%
-          .$pred
-     return(RMSE(predicted_ratings, test_set$rating))
-     
-})
-
-qplot(lambdas, rmses)  
-
-lambda <- lambdas[which.min(rmses)]
-lambda
-
-
-rmse_results <- data_frame(method="Using sum(rating - mu)/(n()+lambda), n_i = n() with min(lambda)",  
-                                     RMSE = min(rmses)) #)
-rmse_results %>% knitr::kable()
-min(rmse_results[2])
-
-
-# END FINAL ALGORITHM
- 
+# see a graph 
+graph<-bank %>% ggplot(aes(age,contact)) +
+   geom_bar(width = 0.4, stat = "identity", color = "red") +
+   coord_flip()  
+graph 
+
+
+set.seed(42, sample.kind="Rounding") 
+
+
+#Models:
+
+#Training  a model using linear discriminant analysis (LDA) with the caret lda method using job as the only predictor.
+#LDA y ~ contact+education+job+age
+train_lda <- train(y ~ contact+education+job+age, method = "lda", data = train_set)
+y_hat <- predict(train_lda, test_set)
+# Accuracy
+
+cm<-confusionMatrix(data = y_hat, reference = test_set$y)$overall["Accuracy"]
+cm
+
+results <- bind_rows(results,
+       data_frame(method="clients who subscribed a term deposit  using LDA ",  
+        Accuracy =cm)
+)
+
+
+
+#Training  using quadratic discriminant analysis (QDA) with the caret qda method using job as the only predictor.
+#QDA y ~ contact+education+job+age
+train_qda <- train(y ~  contact+education+job+age, method = "qda", data = train_set)
+y_hat <- predict(train_qda, test_set)
+# Accuracy
+
+cm<-confusionMatrix(data = y_hat, reference = test_set$y)$overall["Accuracy"]
+cm
+
+results <- bind_rows(results,
+       data_frame(method="clients who subscribed a term deposit  using QDA ",  
+        Accuracy = cm)
+)
+
+
+
+#GLM y ~ contact+education+job+age
+
+# see a graph 
+graph<-bank %>% ggplot(aes(job,contact)) +
+   geom_bar(width = 0.4, stat = "identity", color = "blue") +
+   coord_flip()  
+graph 
+
+
+
+train_glm <- train(y ~ contact+education+job+age, method = "glm", data = train_set)
+y_hat <- predict(train_glm, test_set)
+# Accuracy
+mean(y_hat ==test_set$y)
+cm<-confusionMatrix(data = y_hat, reference = test_set$y)$overall["Accuracy"]
+cm
+
+results <- bind_rows(results,
+data_frame(method="clients who subscribed a term deposit  using GLM Y ~ contact+education+job+age",  
+        Accuracy = cm)
+)
+
+
+
+
+
+results %>% knitr::kable()
+max(results[2])
+
+
