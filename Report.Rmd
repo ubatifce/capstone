@@ -1,33 +1,34 @@
 
----
-title: "Capstone course" 
-author: "ubatifce"
-date: November 1 , 2019"
-output: html_document
----
 
+---
+title: "Capstone Project Overview"
+date: November 5, 2019"
+output:
+  pdf_document: default
+  
+---
 
 
 
 # INDEX
 # 1. Introduction 
 # 2.Executive Summary Section 
-# 2.1 *****Dataset:
-# 2.2 *****Goal of the project 
-# 2.3 *****Key steps that were performed
+# 2.1 **Dataset:
+# 2.2 **Goal of the project 
+# 2.3 **Key steps that were performed
 # 3. Methods/analysis section 
-# 3.1 *****Process and techniques used, 
-# 3.2 ******Data cleaning 
-# 3.3 ******Data exploration 
-# 3.4******Visualization and insights gained
-# 3.5 ******Modeling approach
-# 4. ***Results section ***
-# 4.1 *****Modeling results and discusses 
-# 4.2 *****Model performance
+# 3.1 **Process and techniques used, 
+# 3.2 **Data cleaning 
+# 3.3 **Data exploration 
+# 3.4 **Visualization and insights gained
+# 3.5 **Modeling approach
+# 4. **Results section ***
+# 4.1 **Modeling results and discusses 
+# 4.2 **Model performance
 # 5. Conclusion section 
-# 5.1 *****Summary of the report 
-# 5.2 *****Limitations 
-# 5.3 *****Future work 
+# 5.1 **Summary of the report 
+# 5.2 **Limitations 
+# 5.3 **Future work 
 
 
 
@@ -36,7 +37,7 @@ output: html_document
 
 # 1.Introduction 
 Hello, fellow students.
-My name is Marcello I am submitting my work for your evaluation.
+I am submitting my work for your evaluation.
 I hope the work could be clear enough for you to understand it without effort, at least, I'll do my best to get this objective.
 
 As it is said by the staff, 
@@ -48,363 +49,450 @@ My submission for this project is three files:
     A report in Rmd format: Report.Rmd
     A script in R format: Script.R  
 	
-We've been told to present a script in R format that generates the predicted movie ratings and RMSE score
-This is an individual work. When I say "we" I mean the students who are in this course. We are all doing the same project.
+For this project, I have chosen the public use Bank Marketing Dataset.
+It is available at the UCI site https://archive.ics.uci.edu/ml/datasets/Bank+Marketing#
+Abstract: The data is related with direct marketing campaigns (phone calls) of a Portuguese banking institution. 
+The classification goal is to predict if the client will subscribe a term deposit (variable y).
 	
+
+Data Set Characteristics:  Multivariate
+Number of Instances: 41189
+Area: Business
+Attribute Characteristics: Real
+Number of Attributes: 20
+Missing Values? N/A
+Number of Web Hits: 1018726
+
+
 Files are expected to be downloaded from the uploaded files using the edx submision form. 	
 As the staff recommend also providing a link to a GitHub repository containing the three files above, I also include links to a repository. 
 
 If one or more of these files are damaged or not available,an alternative way to download them is:
-All the files are in the public access repository: https://github.com/ubatifce/capstone
+All the files are in the public access repository: 
 
-	https://raw.githubusercontent.com/ubatifce/capstone/Report.pdf
-    https://raw.githubusercontent.com/ubatifce/capstone/Report.Rmd
-    https://raw.githubusercontent.com/ubatifce/capstone/Script.R
+	https://github.com/ubatifce/capstone
 	or
 	https://github.com/ubatifce/capstone/blob/master/Report.Rmd
 	https://github.com/ubatifce/capstone/blob/master/Report.pdf
     https://github.com/ubatifce/capstone/blob/master/Script.R
+	https://github.com/ubatifce/capstone/blob/master/bank-additional-full.csv
 
-Clone with HTTPS: Use Git or checkout with SVN using the web URL. https://github.com/ubatifce/capstone.git
+	Clone with HTTPS: Use Git or checkout with SVN using the web URL. 
+	https://github.com/ubatifce/capstone.git
 
 #***2. Executive Summary Section ***
 
-*****Dataset:
-A set of datasets were given to us by the staff members.
-The ones that were used were the standard ones, all of the based on the MovieLens database, and downloaded in the ml-10M100K.zip file.
-Anyway, in my script, I used the  automatic downloading procedure so I got:
-
-```{r}
-test_index <- createDataPartition(y = movielens$rating, times = 1, p = 0.1, list = FALSE)
-edx <- movielens[-test_index,]
-temp <- movielens[test_index,]
-validation <- temp %>% 
-     semi_join(edx, by = "movieId") %>%
-     semi_join(edx, by = "userId")
-```
+**Dataset:
+Data Set Information:
 
 
-*****Goal of the project 
-As it was already said, the students have to write a script in R format that generates the predicted movie ratings and RMSE score
-The goal of the project will be then to create a report and a script that has a proper performance calculating the RMSE of the dataset 
+The data is related with direct marketing campaigns of a Portuguese banking institution. 
+The marketing campaigns were based on phone calls. Often, more than one contact to the same client was required, 
+in order to access if the product (bank term deposit) would be (or not) subscribed. 
+
+The dataset is:
+1) bank-additional-full.csv with all examples (41188 rows ) and 20 inputs, ordered by date (from May 2008 to November 2010)
+
+Attribute Information:
+
+Input variables:
+# bank client data:
+1 - age (numeric)
+2 - job : type of job (categorical: 'admin.','blue-collar','entrepreneur','housemaid','management','retired','self-employed','services','student','technician','unemployed','unknown')
+3 - marital : marital status (categorical: 'divorced','married','single','unknown'; note: 'divorced' means divorced or widowed)
+4 - education (categorical: 'basic.4y','basic.6y','basic.9y','high.school','illiterate','professional.course','university.degree','unknown')
+5 - default: has credit in default? (categorical: 'no','yes','unknown')
+6 - housing: has housing loan? (categorical: 'no','yes','unknown')
+7 - loan: has personal loan? (categorical: 'no','yes','unknown')
+# related with the last contact of the current campaign:
+8 - contact: contact communication type (categorical: 'cellular','telephone')
+9 - month: last contact month of year (categorical: 'jan', 'feb', 'mar', ..., 'nov', 'dec')
+10 - day_of_week: last contact day of the week (categorical: 'mon','tue','wed','thu','fri')
+11 - duration: last contact duration, in seconds (numeric). Important note: this attribute highly affects the output target (e.g., if duration=0 then y='no'). Yet, the duration is not known before a call is performed. Also, after the end of the call y is obviously known. Thus, this input should only be included for benchmark purposes and should be discarded if the intention is to have a realistic predictive model.
+# other attributes:
+12 - campaign: number of contacts performed during this campaign and for this client (numeric, includes last contact)
+13 - pdays: number of days that passed by after the client was last contacted from a previous campaign (numeric; 999 means client was not previously contacted)
+14 - previous: number of contacts performed before this campaign and for this client (numeric)
+15 - poutcome: outcome of the previous marketing campaign (categorical: 'failure','nonexistent','success')
+# social and economic context attributes
+16 - emp.var.rate: employment variation rate - quarterly indicator (numeric)
+17 - cons.price.idx: consumer price index - monthly indicator (numeric)
+18 - cons.conf.idx: consumer confidence index - monthly indicator (numeric)
+19 - euribor3m: euribor 3 month rate - daily indicator (numeric)
+20 - nr.employed: number of employees - quarterly indicator (numeric)
+
+Output variable (desired target):
+21 - y - has the client subscribed a term deposit? (binary: 'yes','no')
+
+**Missing Attribute Values: 
+There are several missing values in some categorical attributes, all coded with the "unknown" label. 
+These missing values can be treated as a possible class label or using deletion or imputation techniques. 
+
+The data is enriched by the addition of five new social and economic features/attributes (national wide indicators from a ~10M population country), 
+published by the Banco de Portugal and publicly available at: https://www.bportugal.pt/estatisticasweb.
+This dataset is almost identical to the one used in [Moro et al., 2014] (it does not include all attributes due to privacy concerns). 
 
 
-*****Key steps that were performed
-Instructions say that most learners choose to display all code chunks in the report, but it is not required. 
-We only have to be sure that the report includes the RMSE
-I take this into account. 
-The first step performed was to create a sub set from movielens, called edx
-The second step performed was to create a sub set for validations from movielens, called validation
-The third step was to make sure that validation has the same movieIDs and userIds than edx
+
+**Goal of the project 
+
+The classification goal is to Predict the Success of Bank Telemarketing, that is to predict if the client will subscribe (yes/no) a term deposit (variable y).
+One of the goals is to understand the **contact** media that was used, that is to say the use of telephone calls (fix line calls) , agains cellular calls (mobile line calls).
+(Do people react better when the fix line is used?)
+**Education** level is another field to understand, in special.
+(Is there a trend correlatd with the education level of clients?)
+Combined use of calls and education is important to see if some education levels prefer fix or mobile contacts.
+
+
+
+**Key steps that were performed
+The first step performed was to create a sub set for train , called train_set
+The second step performed was to create a sub set for test, called train_set
+
 
 
 #***3. Methods/analysis section ***
-*****Process and techniques used, 
-Instructions say : “Develop your algorithm using the edx set. For a final test of your algorithm, predict movie ratings in the validation set ”
-I follow these instructions.
+**Process and techniques used, 
 
-*****Data cleaning 
-The first data cleaning uses edx dataset, from movielens, as:
-#given movielens <- left_join(ratings, movies, by = "movieId") downloaded from the initial script
+Being **contact** a column that shows attemps on telephone calls (fix line calls) , agains cellular calls (mobile line calls)
+
+
+1 Baseline: calculated as a sample 0,1.  mean(y_hat ==test_set$y)                
+2 clients who subscribed a term deposit  by contact                              
+3 clients who subscribed a term deposit  using contact,education                 
+4 clients who subscribed a term deposit  using LDA                               
+5 clients who subscribed a term deposit  using QDA                               
+6 clients who subscribed a term deposit  using GLM y ~ contact+education+job+age 
+
+
+
+university.degree   
+
+
+**Data cleaning 
+The first data cleaning/wrangling  was to convert the column y 
+from "Has the client subscribed a term deposit yes/no?" 
+to "Has the client subscribed a term deposit 1/0"
+bank <-  mutate(y = ifelse(y=="yes"), 1, 0))
+***I could used "mutate" or a direct replacement. The second method was used.
+bank$Y<-  1  
+bank$Y[bank$y=="no"]<-  0 # ("no"=0, so now only "yes"=1). No NA's found in the set.
+
+
+**Data exploration 
+
+the objective is then to predict:
+
+*y <- bank$Y
+
+**Visualization and insights gained
+I will be using knitr::kable() to visualize the results
+
+
 ```{r}
-test_index <- createDataPartition(y = movielens$rating, times = 1, p = 0.1, list = FALSE)
-edx <- movielens[-test_index,]
-removed <- anti_join(temp, validation)
-edx <- rbind(edx, removed)
+ bank %>% ggplot(aes(education,contact)) +
+   geom_bar(width = 0.4, stat = "identity", color = "yellow") +
+   coord_flip()  
 ```
-It also uses validation, as
+
+We see that many contacts were made to "universitary degree" or "high school" education
+
 ```{r}
-validation <- temp %>% 
-     semi_join(edx, by = "movieId") %>%
-     semi_join(edx, by = "userId")
+graph<- bank %>% ggplot(aes(job,contact)) +
+   geom_bar(width = 0.4, stat = "identity", color = "blue") +
+   coord_flip()  
 ```
 
-*****Data exploration 
+On the other side, we see that many contacts were made to people who worked as "blue-collars" or "admins" 
 
-A generic (taken from theory) RMSE function looks like this.
 ```{r}
-RMSE <- function(true_ratings, predicted_ratings){
-     sqrt(mean((true_ratings - predicted_ratings)^2))
-}
-```
-
-*****Visualization and insights gained
-
-In order to see the behaviour of the RMSE towards the lambdas, the script contain orders like:
-**** Relationship Lambda vs RMSE
-```{r}
- qplot(lambdas, rmses)  
- ```
- **** Relationship Originals vs Regularized 
- ```{r}
- data_frame(Original = movie_avgs$b_i, 
-           Regularized = movie_reg_avgs$b_i, 
-           n = movie_reg_avgs$n_i) %>%
-     ggplot(aes(Original, Regularized, size=sqrt(n))) + 
-     geom_point(shape=3, alpha=0.25, color="red") 
+ bank %>% ggplot(aes(age,contact)) +
+   geom_bar(width = 0.4, stat = "identity", color = "red") +
+   coord_flip()  
  ```
  
-*****Modeling approach
+ Finally, we see that many contacts were made to people in their 30's (30-40 yrs) 
 
-As the instructions say, I had to be sure not to use the validation set for training or regularization. 
-It is also noted that it is said that "you may wish to create an additional partition of training and test sets from the provided edx dataset to experiment with multiple parameters... "
-This will be taken into account.
 
-I used this approach to experiment without using validation set for training or regularization.
-I created smaller train and test sets, with these characteristics:
+In order to see the behaviour of the RMSE towards the lambdas, the script contain orders like:
+
+
+
 
 ****training and test sets names
 In order not to use validation set for training, I created to experiment:
 
 ```{r}
-set.seed(1, sample.kind="Rounding") 
-test_index <- createDataPartition(y = edx$rating, times = 1,
-                                  p = 0.1, list = FALSE)
-train_set <- edx[-test_index,]
-test_set <- edx[test_index,]
+set.seed(42, sample.kind="Rounding") 
+test_index <- createDataPartition(y, times = 1, p = 0.2, list = FALSE)
+train_set <- bank %>% slice(-test_index)
 ```
 
-****baseline predictors and regularization
-I used mu as the mean of the train set ratings ; mu <- mean(train_set$rating)
-I used lambda as a sequence from 0 to 10 at intervals of 0.125 lambda<- seq(0, 10, 0.125)
- lambdas
- [1]  0.000  0.125  0.250  0.375  0.500  0.625  0.750  0.875  1.000  1.125
-[11]  1.250  1.375  1.500  1.625  1.750  1.875  2.000  2.125  2.250  2.375
-[21]  2.500  2.625  2.750  2.875  3.000  3.125  3.250  3.375  3.500  3.625
-[31]  3.750  3.875  4.000  4.125  4.250  4.375  4.500  4.625  4.750  4.875
-[41]  5.000  5.125  5.250  5.375  5.500  5.625  5.750  5.875  6.000  6.125
-[51]  6.250  6.375  6.500  6.625  6.750  6.875  7.000  7.125  7.250  7.375
-[61]  7.500  7.625  7.750  7.875  8.000  8.125  8.250  8.375  8.500  8.625
-[71]  8.750  8.875  9.000  9.125  9.250  9.375  9.500  9.625  9.750  9.875
-[81] 10.000
+****baseline model
+The baseline model was to create a sample with the values 0-1, meanning suscribe/not suscribe. 
 
-****models used
-
-1.Using AVG of (train ratings)                            
-2 Using AVG(rating- AVG(train ratings) )                    
-3 Using AVG(rating-AVG(train) ratings)-mean(rating - mu)  
-4 Using sum(rating - mu)/(n()+lambda), n_i = n()                  
-5 Using sum(rating - mu)/(n()+lambda), n_i = n() with min(lambda)  
-
-#Best shots and RMSEs
-
-method                                                                                                **RMSE
-
-n=1000
-Using set.seed(1, sample.kind="Rounding") Using Method: sum(rating - mu)/(n()+lambda), n_i = n() with min(lambda) 1.09868
-Using seed(1) Using Method:sum(rating - mu)/(n()+lambda), n_i = n() with min(lambda)  1.098680 ****No change with previous one
-Using seed(755) Using Method: AVG(rating-AVG(train) ratings)-mean(rating - mu) 0.8994061 ****seed affects RMSE!!!!
-
-All other test are Using set.seed(1, sample.kind="Rounding")  
-n=10000
-Using sum(rating - mu)/(n()+lambda), n_i = n() with min(lambda) [1] 0.8697629
+#Baseline: A sample 0,1 
+y_hat <- sample(c(0,1),nrow(test_set),replace=TRUE)
+#Baseline Accuracy
+mean(y_hat ==test_set$y)
 
 
-n=400000
-Using sum(rating - mu)/(n()+lambda), n_i = n() with min(lambda) | 0.8627683|
+****models/calculations used
 
-n=1000000
-|Using sum(rating - mu)/(n()+lambda), n_i = n() with min(lambda) | 0.8736320|
 
-n=5000000
-|Using sum(rating - mu)/(n()+lambda), n_i = n() with min(lambda) | 0.8646980|
+#Accuracy
+                                                                                     
 
-n=nrow(edx)
-|Using sum(rating - mu)/(n()+lambda), n_i = n() with min(lambda) | 0.8642491|
+|method                                                                         |  Accuracy|
+|:------------------------------------------------------------------------------|---------:|
+|Baseline: A sample 0,1                                                         | 0.4956300|
+|clients who subscribed a term deposit  using contact                           | 0.5623938|
+|clients who subscribed a term deposit  using contact,education                 | 0.7808934|
+|clients who subscribed a term deposit  using LDA                               | 0.8882010|
+|clients who subscribed a term deposit  using QDA                               | 0.8402525|
+|clients who subscribed a term deposit  using GLM y ~ contact+education+job+age | 0.8946346|
 
 
 # 4. ***Results section ***
 
-***** 4.1 Modeling results and discusses 
+** 4.1 Modeling results and discusses 
 
-The final RMSE was 0.8642491
-The model chosen was |Using sum(rating - mu)/(n()+lambda), n_i = n() with min(lambda) 
-After trainnig, lambda was able to be optimized.
-At the bottom of this report, the algorithm is exposed.
+I was able to improve prediction from a  0.4956300 of the baseline model to 0.8946346
+The selected Accuracy was then  0.8946346
 
-# 4.2 *****Model performance
+The model chosen was  GLM (y ~ contact+education+job+age)
+ y_hat <- predict(train_lda, test_set)
+ # Accuracy
+ mean(y_hat ==test_set$y) 0.8946346
 
-The model was not changed by the use of seedsdid Using set.seed(1, sample.kind="Rounding") versus Using seed(1)
-However, using other seeds as seed(755) shower a change in the output.
-In this case, the method: AVG(rating-AVG(train) ratings)-mean(rating - mu) seemd to be the best alternative.
-Finally, set.seed(1, sample.kind="Rounding")  was chosen as standard seed for the project.
-Making an analysis of n performance, we can see that after n=1x10^6 we get some stability of the model near  0.86/0.87
-From n=5x10^6 mill to the final dataset, we just get improvements in the third digit or lower.  
+At the bottom of this report, the algorithm is exposed. 
+
+# 4.2 **Model performance
+
+In this case, the method GLM (y ~ contact+education+job+age) seemd to be the best alternative.
+set.seed(42, sample.kind="Rounding") was chosen as standard seed for the project.
 
 
 # 5. Conclusion section 
-# 5.1 *****Summary of the report 
+# 5.1 **Summary of the report 
 
-The goal of the project , in the sense of calculating a RMSE and print the valeus was reached.
-As it was pointed earlier, The final RMSE calculated was 0.8642491
-The model chosen was Using sum(rating - mu)/(n()+lambda), n_i = n() with min(lambda) 
+The goal of the project , in the sense of predict if the client will subscribe a term deposit (variable y). and print the values was reached.
+As it was pointed earlier, The final Accuracy  calculated was 0.8946346
+The model chosen was Using **GLM (y ~ contact+education+job+age)
 
 
-# 5.2 *****Limitations 
+# 5.2 **Limitations 
 
 These models are very difficult to work when you are a student and you do not have access to the ultimates PC.
 Using PCs with low memory ans low processors is possible, but consumes a lot of time.
   
 
-# 5.3 *****Future work 
+# 5.3 **Future work 
 
-This is a nice subject to work with. 
-It would be temting to go on investigating the subjects once the course is finished.
-
-
-
+This is a very nice dataset to work with. 
+It is very important to realize what factors are important while you want to persuade customers to pay for your service.
+I'd rather investigate further after finishing my course.
 
 
-******RMSE algorithm. Function used:
 
-**SEE POST DATA (at the end of the report) for the preliminary code that loads edx and validation:  
 
-In this project this RMSE function will be called using these arguments.
-```{r}
-RMSE <- function(true_ratings, predicted_ratings){
-     sqrt(mean((true_ratings - predicted_ratings)^2))
-}
-```
-```{r}
- RMSE_results<- RMSE(predicted_ratings, validation$rating)
-```
-*****RMSE FINAL MAIN algorithm. 
+***Algorithm. Function used:
+
 
 ```{r}
+################################
+# INIT LOADING DATASETS. SKIP IF DATA IS ALREADY LOADED
+#################################
 
-set.seed(1, sample.kind="Rounding") 
+if(!require(tidyverse)) install.packages("tidyverse", repos = "http://cran.us.r-project.org")
+if(!require(caret)) install.packages("caret", repos = "http://cran.us.r-project.org")
+if(!require(data.table)) install.packages("data.table", repos = "http://cran.us.r-project.org")
+if(!require(dslabs)) install.packages("dslabs", repos = "http://cran.us.r-project.org")
+if(!require(readxl)) install.packages("dslabs", repos = "http://cran.us.r-project.org")
 
-# FINAL ALGORITHM
+#Set default directory to C:/ or change the path in setwd(...)
+setwd("C:/")
+bank<-read.csv2("bank-additional-full.csv") 
+ ncol(bank)
+ nrow(bank)
 
-#training datasets
-#test_index <- createDataPartition(y = edx$rating, times = 1,
-                                  p = 0.1, list = FALSE)
-#train_set <- edx[-test_index,]
-#test_set <- edx[test_index,]
-#test_set <- test_set %>% 
-#     semi_join(train_set, by = "movieId") %>%
-#     semi_join(train_set, by = "userId")
-
-# final datasets
-train_set <- edx
-test_set <- validation
-
-
-
-#A generic (taken fron theory) RMSE function
-
-RMSE <- function(true_ratings, predicted_ratings){
-     sqrt(mean((true_ratings - predicted_ratings)^2))
-}
-
-#Methods used:
-
-               
-          
-#5 Using sum(rating - mu)/(n()+lambda), n_i = n() with min(lambda) 
+# clean the data  
 
 
-mu <- mean(train_set$rating) 
-movie_avgs <- train_set %>% 
-     group_by(movieId) %>% 
-     summarize(b_i = mean(rating - mu))
+#From "Has the client subscribed a term deposit yes/no?"
+#To      "Has the client subscribed a term deposit 1/0"
 
-user_avgs <- test_set %>% 
-     left_join(movie_avgs, by='movieId') %>%
-     group_by(userId) %>%
-     summarize(b_u = mean(rating - mu - b_i))
-
-predicted_ratings <- test_set %>% 
-     left_join(movie_avgs, by='movieId') %>%
-     left_join(user_avgs, by='userId') %>%
-     mutate(pred = mu + b_i + b_u) %>%
-     .$pred
+  bank$Y<-  1
+  bank$Y[bank$y=="no"]<-  0
 
 
-test_set %>% 
-     left_join(movie_avgs, by='movieId') %>%
-     mutate(residual = rating - (mu + b_i)) %>%
-     arrange(desc(abs(residual))) %>% 
-     select(title,  residual) %>% slice(1:10) 
 
-movie_titles <- movielens %>% 
-     select(movieId, title) %>%
-     distinct()
+#Has the client subscribed a term deposit 
+y <- bank$Y
 
-movie_avgs %>% left_join(movie_titles, by="movieId") %>%
-     arrange(b_i) %>% 
-     select(title, b_i) %>% 
-     slice(1:10) 
+#Set the seed to 42, then using the caret package to create a 20% data partition based on the "y" data.
 
+#Assign the 20% partition to test_set and the remaining 80% partition to train_set.
 
-train_set %>% dplyr::count(movieId) %>% 
-     left_join(movie_avgs) %>%
-     left_join(movie_titles, by="movieId") %>%
-     arrange(b_i) %>% 
-     select(title, b_i, n) %>% 
-     slice(1:10) 
+set.seed(42, sample.kind="Rounding") 
+test_index <- createDataPartition(y, times = 1, p = 0.2, list = FALSE)
+train_set <- bank %>% slice(-test_index)
+test_set <- bank %>% slice(test_index)
+print("Train SET")
+nrow(train_set)
+ncol(train_set)
+print("test SET")
+nrow(test_set)
+ncol(test_set)
 
 
-mu <- mean(train_set$rating)
-movie_reg_avgs <- train_set %>% 
-     group_by(movieId) %>% 
-     summarize(b_i = sum(rating - mu)/(n()+lambda), n_i = n()) 
+# Proportion of clients who subscribed a term deposit 
 
-data_frame(Original = movie_avgs$b_i, 
-           Regularized = movie_reg_avgs$b_i, 
-           n = movie_reg_avgs$n_i) %>%
-     ggplot(aes(Original, Regularized, size=sqrt(n))) + 
-     geom_point(shape=3, alpha=0.25, color="red")
+testy<-subset(test_set,test_set$y=="yes")
+
+nrow(testy)/nrow(test_set)
 
 
-train_set %>%
-     dplyr::count(movieId) %>% 
-     left_join(movie_reg_avgs) %>%
-     left_join(movie_titles, by="movieId") %>%
-     arrange(b_i) %>% 
-     select(title, b_i, n) %>% 
-     slice(1:10) 
+#Baseline: Using a  sample 0,1 
+y_hat <- sample(c(0,1),nrow(test_set),replace=TRUE)
+#Baseline Accuracy
+mean(y_hat ==test_set$Y)
+
+results <- data_frame(method="Baseline: A sample 0,1 ", Accuracy =  mean(y_hat ==test_set$Y)
+)
+
+#Proportion of clients who subscribed a term deposit contacted by type of phone
+
+train_set  %>% filter(contact=="cellular") %>% summarize(mean(Y==1))
+train_set  %>% filter(contact=="telephone") %>% summarize(mean(Y==1))
+
+#Predict clients who subscribed a term deposit  using contact on the test set:
+# Accuracy of this contact-based prediction method on the test set
+y_hat <- if_else(test_set$contact=="telephone",1,0)
+# Accuracy
+mean(y_hat ==test_set$Y)
+
+results <- bind_rows(results,
+                          data_frame(method="clients who subscribed a term deposit  using contact ",  
+                           Accuracy = mean(y_hat ==test_set$Y)
+))
 
 
-#5 Using sum(rating - mu)/(n()+lambda), n_i = n() with min(lambda)  
 
 
-lambdas <- seq(2.3, 2.5, 0.125)
-
-rmses <- sapply(lambdas, function(l){
-     mu <- mean(train_set$rating)
-     b_i <- train_set %>%
-          group_by(movieId) %>%
-          summarize(b_i = sum(rating - mu)/(n()+l))
-     b_u <- train_set %>% 
-          left_join(b_i, by="movieId") %>%
-          group_by(userId) %>%
-          summarize(b_u = sum(rating - b_i - mu)/(n()+l))
-     predicted_ratings <- 
-          test_set %>% 
-          left_join(b_i, by = "movieId") %>%
-          left_join(b_u, by = "userId") %>%
-          mutate(pred = mu + b_i + b_u) %>%
-          .$pred
-     return(RMSE(predicted_ratings, test_set$rating))
-     
-})
-
-qplot(lambdas, rmses)  
-
-lambda <- lambdas[which.min(rmses)]
-lambda
+   
 
 
-rmse_results <- data_frame(method="Using sum(rating - mu)/(n()+lambda), n_i = n() with min(lambda)",  
-                                     RMSE = min(rmses)) #)
-rmse_results %>% knitr::kable()
-min(rmse_results[2])
 
 
-# END FINAL ALGORITHM
- 
+#Predicting clients who subscribed a term deposit  by contact & education
+#Accuracy of this contact & education-based prediction method on the test set
+
+
+
+
+# Accuracy
+
+train_set  %>% group_by( contact,education) %>% summarize(mean(Y==1))
+y_hat <- if_else(test_set$contact=="telephone" & test_set$education %in% c("professional.course","university.degree") ,1,0)
+mean(y_hat ==test_set$Y)
+
+# see a graph 
+graph<-bank %>% ggplot(aes(education,contact)) +
+   geom_bar(width = 0.4, stat = "identity", color = "green") +
+   coord_flip()  
+graph 
+
+
+results <- bind_rows(results,
+          data_frame(method="clients who subscribed a term deposit  using contact,education ",  
+           Accuracy = mean(y_hat ==test_set$Y)
+))
+
+#Confusion matrices for the contact  model, education model, and combined contact & #education model.
+
+# see a graph 
+graph<-bank %>% ggplot(aes(age,contact)) +
+   geom_bar(width = 0.4, stat = "identity", color = "red") +
+   coord_flip()  
+graph 
+
+
+set.seed(42, sample.kind="Rounding") 
+
+
+#Models:
+
+#Training  a model using linear discriminant analysis (LDA) with the caret lda method using job as the only predictor.
+#LDA y ~ contact+education+job+age
+train_lda <- train(y ~ contact+education+job+age, method = "lda", data = train_set)
+y_hat <- predict(train_lda, test_set)
+# Accuracy
+
+cm<-confusionMatrix(data = y_hat, reference = test_set$y)$overall["Accuracy"]
+cm
+
+results <- bind_rows(results,
+       data_frame(method="clients who subscribed a term deposit  using LDA ",  
+        Accuracy =cm)
+)
+
+
+
+#Training  using quadratic discriminant analysis (QDA) with the caret qda method using job as the only predictor.
+#QDA y ~ contact+education+job+age
+train_qda <- train(y ~  contact+education+job+age, method = "qda", data = train_set)
+y_hat <- predict(train_qda, test_set)
+# Accuracy
+
+cm<-confusionMatrix(data = y_hat, reference = test_set$y)$overall["Accuracy"]
+cm
+
+results <- bind_rows(results,
+       data_frame(method="clients who subscribed a term deposit  using QDA ",  
+        Accuracy = cm)
+)
+
+
+
+#GLM y ~ contact+education+job+age
+
+# see a graph 
+graph<-bank %>% ggplot(aes(job,contact)) +
+   geom_bar(width = 0.4, stat = "identity", color = "blue") +
+   coord_flip()  
+graph 
+
+
+
+train_glm <- train(y ~ contact+education+job+age, method = "glm", data = train_set)
+y_hat <- predict(train_glm, test_set)
+# Accuracy
+mean(y_hat ==test_set$y)
+cm<-confusionMatrix(data = y_hat, reference = test_set$y)$overall["Accuracy"]
+cm
+
+results <- bind_rows(results,
+data_frame(method="clients who subscribed a term deposit  using GLM Y ~ contact+education+job+age",  
+        Accuracy = cm)
+)
+
+
+
+
+
+results %>% knitr::kable()
+max(results[2])
+
+
+
+
 
 ```
 
 
+**Citation Request:
+
+The dataset is public available for research. 
+Please include this citation if you plan to use this database:
+[Moro et al., 2014] S. Moro, P. Cortez and P. Rita. A Data-Driven Approach to Predict the Success of Bank Telemarketing. Decision Support Systems, Elsevier, 62:22-31, June 2014
