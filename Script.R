@@ -7,10 +7,26 @@ if(!require(caret)) install.packages("caret", repos = "http://cran.us.r-project.
 if(!require(data.table)) install.packages("data.table", repos = "http://cran.us.r-project.org")
 if(!require(dslabs)) install.packages("dslabs", repos = "http://cran.us.r-project.org")
 if(!require(readxl)) install.packages("dslabs", repos = "http://cran.us.r-project.org")
+if(!require(readxl)) install.packages("dslabs", repos = "http://cran.us.r-project.org")
+if(!require(downloader)) install.packages("downloader", repos = "http://cran.us.r-project.org")
+
 
 #Set default directory to C:/ or change the path in setwd(...)
+#Place dataset at the default directory
+
 setwd("C:/")
-bank<-read.csv2("bank-additional-full.csv") 
+
+# If you downloaded bank-additional-full.r from edx you can rename it to bank-additional-full.csv
+#****************************************************************
+#if you do not rename it , anywhay it worked for me to upload as .r file
+# bank-additional-full.csv was renamed as  bank-additional-full.r just to download using edx 
+bank<-read.csv2("bank-additional-full.r") 
+#****************************************************************
+# if you renamed it back as bank-additional.csv you must use
+#bank<-read.csv2("bank-additional-full.csv") 
+#****************************************************************
+
+
  ncol(bank)
  nrow(bank)
 
